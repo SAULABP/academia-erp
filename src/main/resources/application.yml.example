@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/academia_erp
+    username: postgres
+    password: TU_PASSWORD_AQUI
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 8080
+
+app:
+  upload-dir: uploads
+
+jwt:
+  secret: GENERA_UN_SECRETO_BASE64_AQUI
+  expiration: 86400000

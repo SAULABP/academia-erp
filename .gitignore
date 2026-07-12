@@ -1,0 +1,18 @@
+# Compilados de Maven
+target/
+
+# Archivos subidos (fotos de alumnos/productos)
+uploads/
+
+# Configuración con secretos
+src/main/resources/application.yml
+
+# IntelliJ
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# Sistema
+.DS_Store
