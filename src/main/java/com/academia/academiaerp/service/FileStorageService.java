@@ -1,5 +1,6 @@
 package com.academia.academiaerp.service;
 
+import com.academia.academiaerp.exception.RecursoNoEncontradoException;
 import com.academia.academiaerp.exception.ReglaNegocioException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,44 @@ public class FileStorageService {
             }
         } catch (MalformedURLException e) {
             throw new RuntimeException("Error al cargar el archivo: " + nombreArchivo, e);
+        }
+    }
+    // Guardar en una subcarpeta específica (ej: "productos")
+    public String guardarEn(MultipartFile archivo, String subcarpeta) {
+        if (archivo == null || archivo.isEmpty()) {
+            throw new ReglaNegocioException("El archivo está vacío");
+        }
+
+        try {
+            Path carpetaDestino = uploadPath.resolve(subcarpeta);
+            Files.createDirectories(carpetaDestino);
+
+            String extension = obtenerExtension(archivo.getOriginalFilename());
+            String nombreUnico = UUID.randomUUID() + extension;
+
+            Path destino = carpetaDestino.resolve(nombreUnico);
+            Files.copy(archivo.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
+
+            // Devuelve la ruta relativa: "productos/uuid.jpg"
+            return subcarpeta + "/" + nombreUnico;
+        } catch (IOException e) {
+            throw new RuntimeException("Error al guardar el archivo", e);
+        }
+    }
+
+    // Cargar desde cualquier ruta relativa (incluyendo subcarpetas)
+    public Resource cargarRuta(String rutaRelativa) {
+        try {
+            Path archivo = uploadPath.resolve(rutaRelativa);
+            Resource recurso = new UrlResource(archivo.toUri());
+
+            if (recurso.exists() && recurso.isReadable()) {
+                return recurso;
+            } else {
+                throw new RecursoNoEncontradoException("No se encontró el archivo: " + rutaRelativa);
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error al cargar el archivo: " + rutaRelativa, e);
         }
     }
 

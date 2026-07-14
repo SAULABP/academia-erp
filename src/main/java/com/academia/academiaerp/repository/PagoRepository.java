@@ -8,4 +8,5 @@ import java.util.List;
 public interface PagoRepository extends JpaRepository<Pago, Long> {
 
     List<Pago> findByCuotaId(Long cuotaId);
+    List<Pago> findByFechaPagoBetween(java.time.LocalDateTime desde, java.time.LocalDateTime hasta);
 }

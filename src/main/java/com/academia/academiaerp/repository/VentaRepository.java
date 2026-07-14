@@ -8,4 +8,5 @@ import java.util.List;
 public interface VentaRepository extends JpaRepository<Venta, Long> {
 
     List<Venta> findBySedeId(Long sedeId);
+    List<Venta> findByFechaBetween(java.time.LocalDateTime desde, java.time.LocalDateTime hasta);
 }

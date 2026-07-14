@@ -6,6 +6,9 @@ import com.academia.academiaerp.service.ProductoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 
 import java.util.List;
 
@@ -42,6 +45,20 @@ public class ProductoController {
     @PutMapping("/{id}")
     public Producto actualizar(@PathVariable Long id, @RequestBody Producto datos) {
         return productoService.actualizar(id, datos);
+    }
+    @PostMapping("/{id}/imagen")
+    public Producto subirImagen(
+            @PathVariable Long id,
+            @RequestParam("archivo") MultipartFile archivo) {
+        return productoService.subirImagen(id, archivo);
+    }
+
+    @GetMapping("/imagen/{nombreArchivo}")
+    public ResponseEntity<Resource> obtenerImagen(@PathVariable String nombreArchivo) {
+        Resource recurso = productoService.cargarImagen(nombreArchivo);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(recurso);
     }
 
     @DeleteMapping("/{id}")
