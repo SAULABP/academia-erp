@@ -90,6 +90,7 @@ public class AlumnoService {
         alumno.setApoderadoNombre(dto.getApoderadoNombre());
         alumno.setApoderadoTelefono(dto.getApoderadoTelefono());
         alumno.setSede(sede);
+        alumno.setFechaInicio(dto.getFechaInicio());
 
         // 4. Guardar el alumno (ya tiene id)
         Alumno alumnoGuardado = alumnoRepository.save(alumno);
@@ -146,8 +147,15 @@ public class AlumnoService {
     @Transactional
     public AlumnoResponseDTO actualizar(Long id, AlumnoRequestDTO dto) {
         Alumno alumno = alumnoRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Alumno no encontrada con id: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Alumno no encontrado con id: " + id));
 
+        // Si el DNI cambió, validar que el nuevo no lo tenga otro alumno
+        if (!alumno.getDni().equals(dto.getDni())
+                && alumnoRepository.existsByDni(dto.getDni())) {
+            throw new ReglaNegocioException("Ya existe otro alumno con el DNI: " + dto.getDni());
+        }
+
+        alumno.setDni(dto.getDni());
         alumno.setNombres(dto.getNombres());
         alumno.setApellidos(dto.getApellidos());
         alumno.setEdad(dto.getEdad());
@@ -156,6 +164,7 @@ public class AlumnoService {
         alumno.setCuotaMensual(dto.getCuotaMensual());
         alumno.setApoderadoNombre(dto.getApoderadoNombre());
         alumno.setApoderadoTelefono(dto.getApoderadoTelefono());
+        alumno.setFechaInicio(dto.getFechaInicio());
 
         Sede sede = sedeService.buscarPorId(dto.getSedeId());
         alumno.setSede(sede);

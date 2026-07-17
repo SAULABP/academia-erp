@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -24,4 +25,5 @@ public class AlumnoRequestDTO {
     private Long sedeId;
 
     private List<Long> categoriaIds;
+    private LocalDate fechaInicio;
 }

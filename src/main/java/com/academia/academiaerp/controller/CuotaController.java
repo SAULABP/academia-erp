@@ -36,13 +36,9 @@ public class CuotaController {
         CuotaResponseDTO creada = cuotaService.generarCuota(alumnoId, periodo, fechaVencimiento);
         return new ResponseEntity<>(creada, HttpStatus.CREATED);
     }
-
     @PostMapping("/generar-masivo")
-    public ResponseEntity<List<CuotaResponseDTO>> generarMasivo(
-            @RequestParam String periodo,
-            @RequestParam LocalDate fechaVencimiento) {
-        List<CuotaResponseDTO> creadas = cuotaService.generarCuotasMasivas(periodo, fechaVencimiento);
-        return new ResponseEntity<>(creadas, HttpStatus.CREATED);
+    public List<CuotaResponseDTO> generarMasivo(@RequestParam String periodo) {
+        return cuotaService.generarCuotasMasivas(periodo);
     }
 
     @PostMapping("/pagar")

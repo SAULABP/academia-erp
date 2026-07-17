@@ -8,6 +8,7 @@ import com.academia.academiaerp.model.Alumno;
 import com.academia.academiaerp.model.Cuota;
 import com.academia.academiaerp.repository.AlumnoRepository;
 import com.academia.academiaerp.repository.CuotaRepository;
+import com.academia.academiaerp.repository.InscripcionRepository;
 import com.academia.academiaerp.repository.PagoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -25,13 +27,16 @@ public class CuotaService {
     private final CuotaRepository cuotaRepository;
     private final AlumnoRepository alumnoRepository;
     private final PagoRepository pagoRepository;
+    private final InscripcionRepository inscripcionRepository;
 
     public CuotaService(CuotaRepository cuotaRepository,
                         AlumnoRepository alumnoRepository,
-                        PagoRepository pagoRepository) {
+                        PagoRepository pagoRepository,
+                        InscripcionRepository inscripcionRepository) {
         this.cuotaRepository = cuotaRepository;
         this.alumnoRepository = alumnoRepository;
         this.pagoRepository = pagoRepository;
+        this.inscripcionRepository = inscripcionRepository;
     }
 
     // ---- Traductor: entidad Cuota -> DTO ----
@@ -76,22 +81,47 @@ public class CuotaService {
 
     // ---- Generar cuotas para TODOS los alumnos (botón masivo) ----
     @Transactional
-    public List<CuotaResponseDTO> generarCuotasMasivas(String periodo, LocalDate fechaVencimiento) {
+    public List<CuotaResponseDTO> generarCuotasMasivas(String periodo) {
         List<Alumno> alumnos = alumnoRepository.findAll();
+
+        YearMonth ym = YearMonth.parse(periodo);
+        LocalDate finDelPeriodo = ym.atEndOfMonth();
 
         return alumnos.stream()
                 .filter(alumno -> !cuotaRepository.existsByAlumnoIdAndPeriodo(alumno.getId(), periodo))
+                .filter(alumno -> alumno.getFechaRegistro() == null
+                        || !alumno.getFechaRegistro().isAfter(finDelPeriodo))
+                .filter(alumno -> inscripcionRepository.existsByAlumnoIdAndActivaTrue(alumno.getId()))
                 .map(alumno -> {
                     Cuota cuota = new Cuota();
                     cuota.setAlumno(alumno);
                     cuota.setPeriodo(periodo);
                     cuota.setMontoTotal(alumno.getCuotaMensual());
                     cuota.setMontoPagado(BigDecimal.ZERO);
-                    cuota.setFechaVencimiento(fechaVencimiento);
+                    cuota.setFechaVencimiento(calcularVencimiento(alumno, ym));
                     cuota.setEstado(EstadoCuota.PENDIENTE);
                     return convertirAResponse(cuotaRepository.save(cuota));
                 })
                 .toList();
+    }
+
+    // Calcula el vencimiento: el día de inicio del alumno, en el mes del periodo
+    private LocalDate calcularVencimiento(Alumno alumno, YearMonth periodo) {
+        LocalDate inicio = alumno.getFechaInicio() != null
+                ? alumno.getFechaInicio()
+                : alumno.getFechaRegistro();
+
+        // Si no hay ninguna fecha, usar fin de mes como respaldo
+        if (inicio == null) {
+            return periodo.atEndOfMonth();
+        }
+
+        int diaPago = inicio.getDayOfMonth();
+        // Si el día no existe en el mes (ej. 31 en febrero), usar el último día
+        int ultimoDia = periodo.lengthOfMonth();
+        int dia = Math.min(diaPago, ultimoDia);
+
+        return periodo.atDay(dia);
     }
 
     // ---- Registrar un pago sobre una cuota ----

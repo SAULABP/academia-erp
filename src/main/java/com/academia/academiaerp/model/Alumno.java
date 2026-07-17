@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
-
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDate;
 @Entity
 @Table(name = "alumnos")
 @Getter
@@ -47,4 +48,11 @@ public class Alumno {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sede_id", nullable = false)
     private Sede sede;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDate fechaRegistro;
+
+    private LocalDate fechaInicio;
+
 }
