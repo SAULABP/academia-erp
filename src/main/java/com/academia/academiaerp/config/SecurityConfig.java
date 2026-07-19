@@ -22,6 +22,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -42,7 +43,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/productos/imagen/**").permitAll()
                         .requestMatchers("/api/v1/alumnos/foto/**").permitAll()
                         .requestMatchers("/api/v1/configuracion/logo/**").permitAll()

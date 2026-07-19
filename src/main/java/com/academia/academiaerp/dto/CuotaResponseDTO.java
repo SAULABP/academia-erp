@@ -1,6 +1,7 @@
     package com.academia.academiaerp.dto;
 
     import com.academia.academiaerp.enums.EstadoCuota;
+    import com.academia.academiaerp.enums.TipoCuota;
     import lombok.Getter;
     import lombok.Setter;
 
@@ -18,7 +19,9 @@
         private BigDecimal saldoPendiente;
         private LocalDate fechaVencimiento;
         private EstadoCuota estado;
-
         private Long alumnoId;
         private String alumnoNombreCompleto;
+        private TipoCuota tipo;
+        private String apoderadoNombre;
+        private String apoderadoTelefono;
     }

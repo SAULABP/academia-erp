@@ -3,6 +3,7 @@ package com.academia.academiaerp.service;
 import com.academia.academiaerp.dto.ReporteResumenDTO;
 import com.academia.academiaerp.dto.EgresoPorCategoriaDTO;
 import com.academia.academiaerp.enums.CategoriaEgreso;
+import com.academia.academiaerp.enums.TipoCuota;
 import com.academia.academiaerp.model.Egreso;
 import com.academia.academiaerp.model.Pago;
 import com.academia.academiaerp.model.Venta;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ReporteService {
 
@@ -32,7 +33,7 @@ public class ReporteService {
         this.ventaRepository = ventaRepository;
         this.egresoRepository = egresoRepository;
     }
-
+    @Transactional(readOnly = true)
     public ReporteResumenDTO generarReporte(String periodo) {
         // periodo formato "2026-07" -> calcular rango del mes
         YearMonth ym = YearMonth.parse(periodo);
@@ -41,11 +42,20 @@ public class ReporteService {
         LocalDateTime inicio = primerDia.atStartOfDay();
         LocalDateTime fin = ultimoDia.atTime(23, 59, 59);
 
-        // 1. Ingresos por cuotas (pagos del periodo)
+// 1. Ingresos por cuotas (pagos del periodo), separados por tipo
         List<Pago> pagos = pagoRepository.findByFechaPagoBetween(inicio, fin);
-        BigDecimal ingresosCuotas = pagos.stream()
+
+        BigDecimal ingresosMensualidad = pagos.stream()
+                .filter(p -> p.getCuota().getTipo() == TipoCuota.MENSUALIDAD)
                 .map(Pago::getMonto)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal ingresosMatricula = pagos.stream()
+                .filter(p -> p.getCuota().getTipo() == TipoCuota.MATRICULA)
+                .map(Pago::getMonto)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal ingresosCuotas = ingresosMensualidad.add(ingresosMatricula);
 
         // 2. Ingresos por ventas del periodo
         List<Venta> ventas = ventaRepository.findByFechaBetween(inicio, fin);
@@ -76,7 +86,7 @@ public class ReporteService {
             }
         }
 
-        return new ReporteResumenDTO(periodo, ingresosCuotas, ingresosVentas,
-                totalIngresos, totalEgresos, balance, porCategoria);
+        return new ReporteResumenDTO(periodo, ingresosMensualidad, ingresosMatricula,
+                ingresosVentas, totalIngresos, totalEgresos, balance, porCategoria);
     }
 }

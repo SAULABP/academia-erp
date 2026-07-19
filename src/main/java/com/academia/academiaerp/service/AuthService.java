@@ -3,6 +3,8 @@ package com.academia.academiaerp.service;
 import com.academia.academiaerp.dto.AuthResponseDTO;
 import com.academia.academiaerp.dto.LoginRequestDTO;
 import com.academia.academiaerp.dto.RegistroRequestDTO;
+import com.academia.academiaerp.dto.UsuarioResponseDTO;
+import com.academia.academiaerp.exception.RecursoNoEncontradoException;
 import com.academia.academiaerp.exception.ReglaNegocioException;
 import com.academia.academiaerp.model.Usuario;
 import com.academia.academiaerp.repository.UsuarioRepository;
@@ -11,6 +13,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AuthService {
@@ -66,5 +70,19 @@ public class AuthService {
         String token = jwtService.generarToken(userDetails);
 
         return new AuthResponseDTO(token, usuario.getUsername(), usuario.getRol());
+    }
+    // Listar todos los usuarios
+    public List<UsuarioResponseDTO> listarUsuarios() {
+        return usuarioRepository.findAll().stream()
+                .map(u -> new UsuarioResponseDTO(u.getId(), u.getUsername(), u.getRol(), u.getActivo()))
+                .toList();
+    }
+
+    // Activar/desactivar un usuario
+    public void cambiarEstado(Long id, boolean activo) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
+        usuario.setActivo(activo);
+        usuarioRepository.save(usuario);
     }
 }

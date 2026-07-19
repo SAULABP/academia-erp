@@ -5,6 +5,7 @@ import com.academia.academiaerp.service.ConfiguracionService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,11 +25,13 @@ public class ConfiguracionController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Configuracion actualizar(@RequestBody Configuracion datos) {
         return configuracionService.actualizar(datos);
     }
 
     @PostMapping("/logo")
+    @PreAuthorize("hasRole('ADMIN')")
     public Configuracion subirLogo(@RequestParam("archivo") MultipartFile archivo) {
         return configuracionService.subirLogo(archivo);
     }

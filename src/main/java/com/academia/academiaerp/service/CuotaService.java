@@ -2,6 +2,7 @@ package com.academia.academiaerp.service;
 
 import com.academia.academiaerp.dto.CuotaResponseDTO;
 import com.academia.academiaerp.enums.EstadoCuota;
+import com.academia.academiaerp.enums.TipoCuota;
 import com.academia.academiaerp.exception.RecursoNoEncontradoException;
 import com.academia.academiaerp.exception.ReglaNegocioException;
 import com.academia.academiaerp.model.Alumno;
@@ -49,10 +50,12 @@ public class CuotaService {
         dto.setSaldoPendiente(cuota.getMontoTotal().subtract(cuota.getMontoPagado()));
         dto.setFechaVencimiento(cuota.getFechaVencimiento());
         dto.setEstado(cuota.getEstado());
-
         Alumno alumno = cuota.getAlumno();
         dto.setAlumnoId(alumno.getId());
         dto.setAlumnoNombreCompleto(alumno.getNombres() + " " + alumno.getApellidos());
+        dto.setApoderadoNombre(cuota.getAlumno().getApoderadoNombre());
+        dto.setApoderadoTelefono(cuota.getAlumno().getApoderadoTelefono());
+        dto.setTipo(cuota.getTipo());
 
         return dto;
     }
@@ -61,11 +64,11 @@ public class CuotaService {
     @Transactional
     public CuotaResponseDTO generarCuota(Long alumnoId, String periodo, LocalDate fechaVencimiento) {
         Alumno alumno = alumnoRepository.findById(alumnoId)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Alumno no encontrado con id: " + alumnoId));
+                    .orElseThrow(() -> new RecursoNoEncontradoException("Alumno no encontrado con id: " + alumnoId));
 
-        if (cuotaRepository.existsByAlumnoIdAndPeriodo(alumnoId, periodo)) {
-            throw new ReglaNegocioException("El alumno ya tiene una cuota para el periodo " + periodo);
-        }
+            if (cuotaRepository.existsByAlumnoIdAndPeriodo(alumnoId, periodo)) {
+                throw new ReglaNegocioException("El alumno ya tiene una cuota para el periodo " + periodo);
+            }
 
         Cuota cuota = new Cuota();
         cuota.setAlumno(alumno);
@@ -74,6 +77,7 @@ public class CuotaService {
         cuota.setMontoPagado(BigDecimal.ZERO);
         cuota.setFechaVencimiento(fechaVencimiento);
         cuota.setEstado(EstadoCuota.PENDIENTE);
+        cuota.setTipo(TipoCuota.MENSUALIDAD);
 
         Cuota guardada = cuotaRepository.save(cuota);
         return convertirAResponse(guardada);
@@ -100,6 +104,7 @@ public class CuotaService {
                     cuota.setMontoPagado(BigDecimal.ZERO);
                     cuota.setFechaVencimiento(calcularVencimiento(alumno, ym));
                     cuota.setEstado(EstadoCuota.PENDIENTE);
+                    cuota.setTipo(TipoCuota.MENSUALIDAD);
                     return convertirAResponse(cuotaRepository.save(cuota));
                 })
                 .toList();

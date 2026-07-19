@@ -4,6 +4,7 @@ import com.academia.academiaerp.model.Deporte;
 import com.academia.academiaerp.service.DeporteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,16 +26,20 @@ public class DeporteController {
     public Deporte obtener(@PathVariable Long id) {
         return deporteService.buscarPorId(id);
     }
+
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Deporte> crear(@RequestBody Deporte deporte) {
         Deporte creado = deporteService.crear(deporte);
         return new ResponseEntity<>(creado, HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Deporte actualizar(@PathVariable Long id, @RequestBody Deporte deporte) {
         return deporteService.actualizar(id, deporte);
     }
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         deporteService.eliminar(id);
         return ResponseEntity.noContent().build();

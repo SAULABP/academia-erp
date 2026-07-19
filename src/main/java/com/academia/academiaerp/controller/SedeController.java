@@ -4,6 +4,7 @@ import com.academia.academiaerp.model.Sede;
 import com.academia.academiaerp.service.SedeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,17 +30,20 @@ public class SedeController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Sede> crear(@RequestBody Sede sede) {
         Sede creada = sedeService.crear(sede);
         return new ResponseEntity<>(creada, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Sede actualizar(@PathVariable Long id, @RequestBody Sede datos) {
         return sedeService.actualizar(id, datos);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         sedeService.eliminar(id);
         return ResponseEntity.noContent().build();

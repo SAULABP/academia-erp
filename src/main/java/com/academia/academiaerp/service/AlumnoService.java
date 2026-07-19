@@ -3,20 +3,22 @@ package com.academia.academiaerp.service;
 import com.academia.academiaerp.dto.AlumnoRequestDTO;
 import com.academia.academiaerp.dto.AlumnoResponseDTO;
 import com.academia.academiaerp.dto.CategoriaResumenDTO;
+import com.academia.academiaerp.enums.EstadoCuota;
+import com.academia.academiaerp.enums.TipoCuota;
 import com.academia.academiaerp.exception.RecursoNoEncontradoException;
 import com.academia.academiaerp.exception.ReglaNegocioException;
-import com.academia.academiaerp.model.Alumno;
-import com.academia.academiaerp.model.Categoria;
-import com.academia.academiaerp.model.Inscripcion;
-import com.academia.academiaerp.model.Sede;
+import com.academia.academiaerp.model.*;
 import com.academia.academiaerp.repository.AlumnoRepository;
+import com.academia.academiaerp.repository.CuotaRepository;
 import com.academia.academiaerp.repository.InscripcionRepository;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -27,17 +29,20 @@ public class AlumnoService {
     private final SedeService sedeService;
     private final CategoriaService categoriaService;
     private final FileStorageService fileStorageService;
+    private final CuotaRepository  cuotaRepository;
 
     public AlumnoService(AlumnoRepository alumnoRepository,
                          InscripcionRepository inscripcionRepository,
                          SedeService sedeService,
                          CategoriaService categoriaService,
-                         FileStorageService fileStorageService) {
+                         FileStorageService fileStorageService,
+                         CuotaRepository cuotaRepository) {
         this.alumnoRepository = alumnoRepository;
         this.inscripcionRepository = inscripcionRepository;
         this.sedeService = sedeService;
         this.categoriaService = categoriaService;
         this.fileStorageService = fileStorageService;
+        this.cuotaRepository = cuotaRepository;
     }
 
     // ---- Traductor: entidad Alumno -> AlumnoResponseDTO ----
@@ -94,6 +99,18 @@ public class AlumnoService {
 
         // 4. Guardar el alumno (ya tiene id)
         Alumno alumnoGuardado = alumnoRepository.save(alumno);
+        if (dto.getMontoMatricula() != null
+                && dto.getMontoMatricula().compareTo(BigDecimal.ZERO) > 0) {
+            Cuota matricula = new Cuota();
+            matricula.setAlumno(alumnoGuardado);
+            matricula.setTipo(TipoCuota.MATRICULA);
+            matricula.setPeriodo(YearMonth.now().toString());
+            matricula.setMontoTotal(dto.getMontoMatricula());
+            matricula.setMontoPagado(BigDecimal.ZERO);
+            matricula.setFechaVencimiento(LocalDate.now().plusDays(7));
+            matricula.setEstado(EstadoCuota.PENDIENTE);
+            cuotaRepository.save(matricula);
+        }
 
         // 5. Crear una inscripción por cada categoriaId recibido
         if (dto.getCategoriaIds() != null) {

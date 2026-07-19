@@ -26,4 +26,5 @@ public class AlumnoRequestDTO {
 
     private List<Long> categoriaIds;
     private LocalDate fechaInicio;
+    private BigDecimal montoMatricula;
 }

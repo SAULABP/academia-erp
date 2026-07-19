@@ -1,6 +1,7 @@
 package com.academia.academiaerp.model;
 
 import com.academia.academiaerp.enums.EstadoCuota;
+import com.academia.academiaerp.enums.TipoCuota;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -44,4 +45,9 @@ public class Cuota {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alumno_id", nullable = false)
     private Alumno alumno;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoCuota tipo;
+
 }

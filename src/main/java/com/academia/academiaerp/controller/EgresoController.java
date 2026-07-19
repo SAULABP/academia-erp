@@ -4,9 +4,11 @@ import com.academia.academiaerp.model.Egreso;
 import com.academia.academiaerp.service.EgresoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @RequestMapping("/api/v1/egresos")
 public class EgresoController {

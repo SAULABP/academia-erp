@@ -55,4 +55,6 @@ public class Alumno {
 
     private LocalDate fechaInicio;
 
+    private BigDecimal montoMatricula;
+
 }

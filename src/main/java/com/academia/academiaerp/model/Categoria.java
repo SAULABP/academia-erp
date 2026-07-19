@@ -34,4 +34,8 @@ public class Categoria {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sede_id", nullable = false)
     private Sede sede;
+
+    private Integer cupoMaximo;
+
+    private String horario;
 }

@@ -13,4 +13,9 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Long> 
 
     boolean existsByAlumnoIdAndCategoriaId(Long alumnoId, Long categoriaId);
     boolean existsByAlumnoIdAndActivaTrue(Long alumnoId);
+    // Contar alumnos activos en una categoría (para la card "15/25")
+    long countByCategoriaIdAndActivaTrue(Long categoriaId);
+
+    // Listar inscripciones activas de una categoría (para ver los inscritos)
+    List<Inscripcion> findByCategoriaIdAndActivaTrue(Long categoriaId);
 }
