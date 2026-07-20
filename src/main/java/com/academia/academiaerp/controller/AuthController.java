@@ -23,7 +23,7 @@ public class AuthController {
     }
 
     @PostMapping("/registro")
-    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthResponseDTO> registrar(@RequestBody RegistroRequestDTO dto) {
         return new ResponseEntity<>(authService.registrar(dto), HttpStatus.CREATED);
     }
