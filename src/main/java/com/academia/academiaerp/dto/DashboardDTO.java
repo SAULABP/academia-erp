@@ -15,10 +15,12 @@ public class DashboardDTO {
     private BigDecimal egresosMes;
     private BigDecimal balanceMes;
     private List<CuotaResponseDTO> cuotasPorVencer;
+    private List<AlumnosPorSedeDTO> alumnosPorSede;
 
     public DashboardDTO(long totalAlumnos, long cuotasPendientes, BigDecimal montoPorCobrar,
                         BigDecimal ingresosMes, BigDecimal egresosMes, BigDecimal balanceMes,
-                        List<CuotaResponseDTO> cuotasPorVencer) {
+                        List<CuotaResponseDTO> cuotasPorVencer,
+                        List<AlumnosPorSedeDTO> alumnosPorSede) {
         this.totalAlumnos = totalAlumnos;
         this.cuotasPendientes = cuotasPendientes;
         this.montoPorCobrar = montoPorCobrar;
@@ -26,5 +28,6 @@ public class DashboardDTO {
         this.egresosMes = egresosMes;
         this.balanceMes = balanceMes;
         this.cuotasPorVencer = cuotasPorVencer;
+        this.alumnosPorSede = alumnosPorSede;
     }
 }

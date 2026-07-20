@@ -36,11 +36,5 @@ public class ConfiguracionController {
         return configuracionService.subirLogo(archivo);
     }
 
-    @GetMapping("/logo/{nombreArchivo}")
-    public ResponseEntity<Resource> obtenerLogo(@PathVariable String nombreArchivo) {
-        Resource recurso = configuracionService.cargarLogo(nombreArchivo);
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_PNG)
-                .body(recurso);
-    }
+
 }

@@ -40,13 +40,10 @@ public class ConfiguracionService {
     // Subir/reemplazar el logo
     public Configuracion subirLogo(MultipartFile archivo) {
         Configuracion config = obtener();
-        String rutaCompleta = fileStorageService.guardarEn(archivo, "logos");
-        String soloNombre = rutaCompleta.substring(rutaCompleta.indexOf("/") + 1);
-        config.setLogoUrl(soloNombre);
+        String urlLogo = fileStorageService.guardarEn(archivo, "logos");
+        config.setLogoUrl(urlLogo);
         return configuracionRepository.save(config);
     }
 
-    public org.springframework.core.io.Resource cargarLogo(String nombreArchivo) {
-        return fileStorageService.cargarRuta("logos/" + nombreArchivo);
-    }
+
 }

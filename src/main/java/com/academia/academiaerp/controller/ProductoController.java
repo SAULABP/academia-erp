@@ -54,13 +54,6 @@ public class ProductoController {
         return productoService.subirImagen(id, archivo);
     }
 
-    @GetMapping("/imagen/{nombreArchivo}")
-    public ResponseEntity<Resource> obtenerImagen(@PathVariable String nombreArchivo) {
-        Resource recurso = productoService.cargarImagen(nombreArchivo);
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(recurso);
-    }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")

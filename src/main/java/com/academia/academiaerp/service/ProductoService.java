@@ -56,14 +56,10 @@ public class ProductoService {
 
     public Producto subirImagen(Long id, MultipartFile archivo) {
         Producto producto = buscarPorId(id);
-        String rutaCompleta = fileStorageService.guardarEn(archivo, "productos");
-        // rutaCompleta = "productos/uuid.jpg" -> guardamos solo "uuid.jpg"
-        String soloNombre = rutaCompleta.substring(rutaCompleta.indexOf("/") + 1);
-        producto.setImagenUrl(soloNombre);
+        String urlProducto = fileStorageService.guardarEn(archivo, "productos");
+        producto.setImagenUrl(urlProducto);
         return productoRepository.save(producto);
     }
 
-    public Resource cargarImagen(String nombreArchivo) {
-        return fileStorageService.cargarRuta("productos/" + nombreArchivo);
-    }
+
 }

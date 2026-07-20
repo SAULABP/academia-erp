@@ -44,9 +44,6 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/login").permitAll()
-                        .requestMatchers("/api/v1/productos/imagen/**").permitAll()
-                        .requestMatchers("/api/v1/alumnos/foto/**").permitAll()
-                        .requestMatchers("/api/v1/configuracion/logo/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -79,7 +76,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+
+        // Orígenes permitidos: local + producción (desde variable de entorno)
+        String frontendUrl = System.getenv("FRONTEND_URL");
+        if (frontendUrl != null && !frontendUrl.isBlank()) {
+            configuration.setAllowedOrigins(List.of("http://localhost:5173", frontendUrl));
+        } else {
+            configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        }
+
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

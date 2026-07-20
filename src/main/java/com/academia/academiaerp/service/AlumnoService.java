@@ -190,9 +190,7 @@ public class AlumnoService {
         return convertirAResponse(actualizado);
     }
 
-    public Resource cargarFoto(String nombreArchivo) {
-        return fileStorageService.cargar(nombreArchivo);
-    }
+
 
     // ---- Eliminar ----
     @Transactional

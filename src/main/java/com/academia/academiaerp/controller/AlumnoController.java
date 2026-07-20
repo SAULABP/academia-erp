@@ -38,13 +38,7 @@ public class AlumnoController {
         return alumnoService.buscarPorId(id);
     }
 
-    @GetMapping("/foto/{nombreArchivo}")
-    public ResponseEntity<Resource> obtenerFoto(@PathVariable String nombreArchivo) {
-        Resource recurso = alumnoService.cargarFoto(nombreArchivo);
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(recurso);
-    }
+
 
     @PostMapping
     public ResponseEntity<AlumnoResponseDTO> crear(@RequestBody AlumnoRequestDTO dto) {

@@ -1,8 +1,10 @@
 package com.academia.academiaerp.service;
 
+import com.academia.academiaerp.dto.AlumnosPorSedeDTO;
 import com.academia.academiaerp.dto.DashboardDTO;
 import com.academia.academiaerp.dto.CuotaResponseDTO;
 import com.academia.academiaerp.enums.EstadoCuota;
+import com.academia.academiaerp.model.Alumno;
 import com.academia.academiaerp.model.Cuota;
 import com.academia.academiaerp.repository.AlumnoRepository;
 import com.academia.academiaerp.repository.CuotaRepository;
@@ -12,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DashboardService {
@@ -54,6 +57,19 @@ public class DashboardService {
                 .limit(5)
                 .map(this::aDTO)
                 .toList();
+        // Alumnos agrupados por sede
+        List<Alumno> todosAlumnos = alumnoRepository.findAll();
+        Map<String, Long> conteoPorSede = todosAlumnos.stream()
+                .filter(a -> a.getSede() != null)
+                .collect(java.util.stream.Collectors.groupingBy(
+                        a -> a.getSede().getNombre(),
+                        java.util.stream.Collectors.counting()
+                ));
+
+        List<AlumnosPorSedeDTO> alumnosPorSede = conteoPorSede.entrySet().stream()
+                .map(e -> new AlumnosPorSedeDTO(e.getKey(), e.getValue()))
+                .sorted((a, b) -> Long.compare(b.getCantidad(), a.getCantidad())) // mayor a menor
+                .toList();
 
         return new DashboardDTO(
                 totalAlumnos,
@@ -62,7 +78,8 @@ public class DashboardService {
                 reporte.getTotalIngresos(),
                 reporte.getTotalEgresos(),
                 reporte.getBalance(),
-                porVencer
+                porVencer,
+                alumnosPorSede   // <-- nuevo
         );
     }
 
