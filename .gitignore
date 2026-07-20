@@ -17,5 +17,5 @@ src/main/resources/application.yml
 # Sistema
 .DS_Store
 # Secretos - no subir
-application.yml
+#application.yml - > ya es seguro subirlo
 .env
