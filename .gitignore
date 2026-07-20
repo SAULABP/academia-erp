@@ -5,7 +5,6 @@ target/
 uploads/
 
 # Configuración con secretos
-src/main/resources/application.yml
 
 # IntelliJ
 .idea/
@@ -17,5 +16,4 @@ src/main/resources/application.yml
 # Sistema
 .DS_Store
 # Secretos - no subir
-#application.yml - > ya es seguro subirlo
 .env
